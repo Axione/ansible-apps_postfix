@@ -1,0 +1,29 @@
+---
+- name: "Install postfix packages"
+  ansible.builtin.package:
+    name: ['postfix', 'sasl2-bin', 'libsasl2-modules']
+    state: present
+  register: pkg_result
+  retries: 12
+  delay: 10
+  until: pkg_result is success
+
+- name: "Configure main.cf"
+  ansible.builtin.template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: 0444
+    backup: true
+  notify: restart postfix
+
+- name: Include sasl tasks
+  ansible.builtin.include_tasks: sasl.yml
+  when:
+    - postfix_sasl_auth_enable is defined
+    - postfix_sasl_auth_enable | bool
+
+- name: rebuild newaliases
+  ansible.builtin.command: newaliases
+  changed_when: false

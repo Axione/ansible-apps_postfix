@@ -1,0 +1,39 @@
+---
+postfix_myhostname: "{{ ansible_hostname }}"
+postfix_mydomain: ""
+postfix_mynetworks: "127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128"
+postfix_mydestination: "{{ ansible_hostname }}, localhost.localdomain, localhost"
+
+postfix_smtpd_banner: "$myhostname ESMTP $mail_name (Debian/GNU)"
+postfix_compatibility_level: 2
+
+##
+postfix_inet_interfaces: "all"
+postfix_inet_protocols: "ipv4"
+
+postfix_alias_maps: "hash:/etc/aliases"
+postfix_alias_database: "hash:/etc/aliases"
+
+postfix_relayhost: ""
+postfix_smtpd_use_tls: "yes"
+postfix_smtpd_tls_received_header: "yes"
+postfix_smtpd_tls_cert_file: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+postfix_smtpd_tls_key_file: "/etc/ssl/private/ssl-cert-snakeoil.key"
+postfix_smtpd_relay_restrictions: "permit_sasl_authenticated reject_unauth_destination"
+
+postfix_sasl_auth_enable: false
+# If configured will use local sasldb2 plain text file
+# sasldb2_file: "/var/spool/postfix/etc/sasldb2"
+sasldb2_username: "toto@toto.com"
+sasldb2_password: "toto"
+# If enabled will use saslauthd + ldap
+saslauthd_enable: "yes"
+saslauthd_ldap_url: ""
+saslauthd_ldap_userdn: ""
+# saslauthd_ldap_binduser: ""
+# saslauthd_ldap_bindpassword: ""
+
+mailjet_username: ""
+mailjet_password: ""
+
+postfix_extra_options: ""
