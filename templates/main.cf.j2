@@ -1,62 +1,55 @@
 {{ ansible_managed | comment }}
 
-### Directories
-#command_directory = /usr/sbin
-#daemon_directory = /usr/libexec/postfix
-#data_directory = /var/lib/postfix
-#meta_directory = /etc/postfix
-#shlib_directory = /usr/lib/postfix
-#manpage_directory = /usr/share/man
-#sample_directory = /usr/share/doc/postfix3-3.0.3/samples
-#readme_directory = /usr/share/doc/postfix3-3.0.3/README_FILES
-#mailq_path = /usr/bin/mailq.postfix
-#sendmail_path = /usr/sbin/sendmail.postfix
-#newaliases_path = /usr/bin/newaliases.postfix
-
 ### Global
 smtpd_banner = {{ postfix_smtpd_banner }}
-biff = no
-append_dot_mydomain = no
-readme_directory = no
+biff = {{ postfix_biff }}
+append_dot_mydomain = {{ postfix_append_dot_mydomain }}
+readme_directory = {{ postfix_readme_directory }}
 compatibility_level = {{ postfix_compatibility_level }}
+mail_owner = {{ postfix_mail_owner }}
 
 ### Server
-#myorigin = {{ ansible_hostname }}
+{% if postfix_mydomain is defined and postfix_mydomain | length > 0 %}
+mydomain = {{ postfix_mydomain }}
+{% endif %}
+myorigin = {{ ansible_myorigin }}
 myhostname = {{ postfix_myhostname }}
 mynetworks = {{ postfix_mynetworks }}
 mydestination = {{ postfix_mydestination }}
+relayhost = {{ postfix_relayhost }}
 
-{% if postfix_mydomain is defined and postfix_mydomain | length > 0 %}
-mydomain = {{ postfix_mydomain }}
+### Maps
+local_recipient_maps = {{ postfix_local_recipient_maps }}
+# Aliases are virtualised as we have to rewrite mostly every internal addresses (cf. virtual_alias_maps)
+alias_maps = {{ postfix_alias_maps }}
+alias_database = {{ postfix_alias_database }}
+{% if postfix_map_extra_conf is defined and postfix_map_extra_conf | length > 0 %}
+{{ postfix_map_extra_conf }}
 {% endif %}
 
 ### Nerwork
 inet_interfaces = {{ postfix_inet_interfaces }}
 inet_protocols = {{ postfix_inet_protocols }}
+{% if postfix_network_extra_conf is defined and postfix_network_extra_conf | length > 0 %}
+{{ postfix_network_extra_conf }}
+{% endif %}
 
 ### queues and limits
 mailbox_size_limit = 0
 recipient_delimiter = +
 queue_directory = /var/spool/postfix
-#message_size_limit = 52428800
-#maximal_queue_lifetime = 10d
-#bounce_queue_lifetime = 10d
+message_size_limit = 52428800
 
-### Alias
-alias_maps = {{ postfix_alias_maps }}
-alias_database = {{ postfix_alias_database }}
-
-### smtp
-relayhost = {{ postfix_relayhost }}
-# TLS parameters
+### TLS parameters
+# client side
 smtp_tls_CApath=/etc/ssl/certs
 smtp_tls_security_level=may
-#smtp_tls_mandatory_ciphers = high
+smtp_tls_mandatory_ciphers = high
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
-
-#smtpd_use_tls= {{ postfix_smtpd_use_tls }}
-#smtpd_tls_received_header = {{ postfix_smtpd_tls_received_header }}
-smtpd_tls_security_level=may
+# server side
+smtpd_use_tls= {{ postfix_smtpd_use_tls }}
+smtpd_tls_received_header = {{ postfix_smtpd_tls_received_header }}
+smtpd_tls_security_level={{ postfix_smtpd_tls_security_level }}
 smtpd_tls_cert_file={{ postfix_smtpd_tls_cert_file }}
 smtpd_tls_key_file={{ postfix_smtpd_tls_key_file }}
 smtpd_relay_restrictions={{ postfix_smtpd_relay_restrictions }}

@@ -1,22 +1,38 @@
 ---
-postfix_myhostname: "{{ ansible_hostname }}"
+### Global
+postfix_smtpd_banner: "$myhostname ESMTP $mail_name (Debian/GNU)"
+postfix_biff: "no"
+postfix_append_dot_mydomain: "no"
+postfix_readme_directory: "no"
+postfix_compatibility_level: 2
+postfix_mail_owner: "postfix"
+
+### Server
 postfix_mydomain: ""
+ansible_myorigin: "{{ ansible_hostname }}"
+postfix_myhostname: "{{ ansible_hostname }}"
 postfix_mynetworks: "127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128"
 postfix_mydestination: "{{ ansible_hostname }}, localhost.localdomain, localhost"
+postfix_relayhost: ""
 
-postfix_smtpd_banner: "$myhostname ESMTP $mail_name (Debian/GNU)"
-postfix_compatibility_level: 2
-
-##
-postfix_inet_interfaces: "all"
-postfix_inet_protocols: "ipv4"
-
+### Maps
+postfix_local_recipient_maps: ""
 postfix_alias_maps: "hash:/etc/aliases"
 postfix_alias_database: "hash:/etc/aliases"
+postfix_map_extra_conf: ""
 
-postfix_relayhost: ""
+### Network
+postfix_inet_interfaces: "all"
+postfix_inet_protocols: "ipv4"
+postfix_network_extra_conf: ""
+
+### Queeus and limits
+
+
+### TLS
 postfix_smtpd_use_tls: "yes"
 postfix_smtpd_tls_received_header: "yes"
+postfix_smtpd_tls_security_level: "may"
 postfix_smtpd_tls_cert_file: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
 postfix_smtpd_tls_key_file: "/etc/ssl/private/ssl-cert-snakeoil.key"
 postfix_smtpd_relay_restrictions: "permit_sasl_authenticated reject_unauth_destination"
@@ -32,7 +48,6 @@ saslauthd_ldap_url: ""
 saslauthd_ldap_userdn: ""
 # saslauthd_ldap_binduser: ""
 # saslauthd_ldap_bindpassword: ""
-
 mailjet_username: ""
 mailjet_password: ""
 
