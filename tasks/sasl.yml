@@ -17,8 +17,8 @@
     mode: 0400
     backup: true
   notify:
-    - postmap sasl_passwd
-    - reload postfix
+    - Postmap sasl_passwd
+    - Reload postfix
 
 - name: "Configure sasl module"
   ansible.builtin.template:
@@ -28,14 +28,14 @@
     group: root
     mode: 0444
     backup: true
-  notify: restart postfix
+  notify: Restart postfix
 
 - name: "Configure relay user"
   ansible.builtin.command: saslpasswd2 -c -p -f {{ sasldb2_file }} {{ sasldb2_username | quote }}
   changed_when: false
   args:
     stdin: "{{ sasldb2_password }}"
-  notify: restart postfix
+  notify: Restart postfix
   when: sasldb2_file is defined
 
 - name: "Check sasldb2 credentials"
@@ -55,7 +55,7 @@
     group: root
   when:
     - saslauthd_enable | bool
-  notify: restart saslauthd
+  notify: Restart saslauthd
 
 - name: "Enable saslauthd"
   ansible.builtin.lineinfile:
@@ -65,7 +65,7 @@
     backup: true
   when:
     - saslauthd_enable | bool
-  notify: restart saslauthd
+  notify: Restart saslauthd
 
 - name: "Change saslauthd mechanism"
   ansible.builtin.lineinfile:
@@ -75,7 +75,7 @@
     backup: true
   when:
     - saslauthd_enable | bool
-  notify: restart saslauthd
+  notify: Restart saslauthd
 
 - name: "Change saslauthd mechanism options"
   ansible.builtin.lineinfile:
@@ -85,7 +85,7 @@
     backup: true
   when:
     - saslauthd_enable | bool
-  notify: restart saslauthd
+  notify: Restart saslauthd
 
 - name: "Change saslauthd socket"
   ansible.builtin.lineinfile:
@@ -96,7 +96,7 @@
     backup: true
   when:
     - saslauthd_enable | bool
-  notify: restart saslauthd
+  notify: Restart saslauthd
 
 - name: "Create saslauthd socker dir"
   ansible.builtin.command: dpkg-statoverride --add root sasl 710 /var/spool/postfix/var/run/saslauthd
@@ -113,4 +113,4 @@
     append: true
   when:
     - saslauthd_enable | bool
-  notify: restart postfix
+  notify: Restart postfix

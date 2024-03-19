@@ -16,7 +16,7 @@
     group: root
     mode: 0444
     backup: true
-  notify: restart postfix
+  notify: Restart postfix
 
 - name: Include sasl tasks
   ansible.builtin.include_tasks: sasl.yml
@@ -24,6 +24,6 @@
     - postfix_sasl_auth_enable is defined
     - postfix_sasl_auth_enable | bool
 
-- name: rebuild newaliases
+- name: Rebuild newaliases
   ansible.builtin.command: newaliases
   changed_when: false
