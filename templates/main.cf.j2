@@ -42,17 +42,17 @@ message_size_limit = 52428800
 
 ### TLS parameters
 # client side
-smtp_tls_CApath=/etc/ssl/certs
-smtp_tls_security_level=may
+smtp_tls_CApath = /etc/ssl/certs
+smtp_tls_security_level = may
 smtp_tls_mandatory_ciphers = high
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 # server side
 smtpd_use_tls= {{ postfix_smtpd_use_tls }}
 smtpd_tls_received_header = {{ postfix_smtpd_tls_received_header }}
 smtpd_tls_security_level={{ postfix_smtpd_tls_security_level }}
-smtpd_tls_cert_file={{ postfix_smtpd_tls_cert_file }}
-smtpd_tls_key_file={{ postfix_smtpd_tls_key_file }}
-smtpd_relay_restrictions={{ postfix_smtpd_relay_restrictions }}
+smtpd_tls_cert_file = {{ postfix_smtpd_tls_cert_file }}
+smtpd_tls_key_file = {{ postfix_smtpd_tls_key_file }}
+smtpd_relay_restrictions = {{ postfix_smtpd_relay_restrictions }}
 
 {% if postfix_sasl_auth_enable is defined and postfix_sasl_auth_enable is sameas true %}
 # force client auth
