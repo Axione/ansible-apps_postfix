@@ -14,7 +14,7 @@
     dest: /etc/postfix/main.cf
     owner: root
     group: root
-    mode: 0444
+    mode: '0444'
     backup: true
   notify: Restart postfix
 

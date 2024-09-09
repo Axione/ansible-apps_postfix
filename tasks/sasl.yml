@@ -14,7 +14,7 @@
     dest: /etc/postfix/sasl_passwd
     owner: root
     group: root
-    mode: 0400
+    mode: '0400'
     backup: true
   notify:
     - Postmap sasl_passwd
@@ -26,7 +26,7 @@
     dest: /etc/postfix/sasl/smtpd.conf
     owner: root
     group: root
-    mode: 0444
+    mode: '0444'
     backup: true
   notify: Restart postfix
 
@@ -41,7 +41,7 @@
 - name: "Check sasldb2 credentials"
   ansible.builtin.file:
     path: "{{ sasldb2_file }}"
-    mode: 0440
+    mode: '0440'
     owner: root
     group: postfix
   when: sasldb2_file is defined
@@ -50,7 +50,7 @@
   ansible.builtin.template:
     src: saslauthd.conf.j2
     dest: /etc/saslauthd.conf
-    mode: 0440
+    mode: '0440'
     owner: root
     group: root
   when:
