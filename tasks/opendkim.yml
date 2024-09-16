@@ -1,0 +1,100 @@
+---
+- name: "Install dkim packages"
+  ansible.builtin.package:                                                                                                                                                                                          
+    name: ['opendkim', 'opendkim-tools']
+    state: present
+  register: pkg_result
+  retries: 12
+  delay: 10
+  until: pkg_result is success
+
+- name: "Configure /etc/opendkim.conf"
+  ansible.builtin.template:
+    src: opendkim.conf.j2
+    dest: /etc/opendkim.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  notify: Restart postfix
+
+- name: "Configure /etc/default/opendkim"
+  ansible.builtin.template:
+    src: default_opendkim.j2
+    dest: /etc/default/opendkim
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart opendkim
+
+- name: Create opendkim folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /etc/opendkim
+    - /etc/opendkim/keys
+
+- name: "Configure /etc/opendkim/TrustedHosts"
+  ansible.builtin.template:
+    src: opendkim_trustedhosts.j2
+    dest: /etc/opendkim/TrustedHosts
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart opendkim
+
+- name: "Configure /etc/opendkim/KeyTable"
+  ansible.builtin.template:
+    src: opendkim_keytable.j2
+    dest: /etc/opendkim/KeyTable
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart opendkim
+
+- name: "Configure /etc/opendkim/SigningTable"
+  ansible.builtin.template:
+    src: opendkim_signingtable.j2
+    dest: /etc/opendkim/SigningTable
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart opendkim
+
+- name: Create opendkim keys folders
+  ansible.builtin.file:
+    path: "/etc/opendkim/keys/{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items: "{{ smtp_opendkim_domains }}"
+
+- name: opendkim | generate keys
+  ansible.builtin.command: "opendkim-genkey -s smtp -d {{ item }}"
+  args:
+    chdir: "/etc/opendkim/keys/{{ item }}"
+  with_items: "{{ smtp_opendkim_domains }}"
+
+- name: Chown keys private
+  ansible.builtin.file:
+    path: "/etc/opendkim/keys/{{ item }}/smtp.private"
+    mode: '0600'
+    owner: opendkim
+    group: opendkim
+  with_items: "{{ smtp_opendkim_domains }}"
+
+- name: Chown keys public
+  ansible.builtin.file:
+    path: "/etc/opendkim/keys/{{ item }}/smtp.txt"
+    mode: '0600'
+    owner: opendkim
+    group: opendkim
+  with_items: "{{ smtp_opendkim_domains }}"
+
+- name: Start opendkim
+  ansible.builtin.systemd:
+    name: opendkim
+    state: started
+    enabled: true
+  notify: Restart postfix

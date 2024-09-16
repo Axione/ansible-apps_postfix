@@ -6,21 +6,27 @@ biff = {{ postfix_biff }}
 append_dot_mydomain = {{ postfix_append_dot_mydomain }}
 readme_directory = {{ postfix_readme_directory }}
 compatibility_level = {{ postfix_compatibility_level }}
+{% if postfix_mail_owner is defined and postfix_mail_owner | length > 0 %}
 mail_owner = {{ postfix_mail_owner }}
-
-### Server
+{% endif %}
 {% if postfix_mydomain is defined and postfix_mydomain | length > 0 %}
 mydomain = {{ postfix_mydomain }}
 {% endif %}
-myorigin = {{ ansible_myorigin }}
+{% if postfix_myorigin is defined and postfix_myorigin | length > 0 %}
+myorigin = {{ postfix_myorigin }}
+{% endif %}
 myhostname = {{ postfix_myhostname }}
 mynetworks = {{ postfix_mynetworks }}
 mydestination = {{ postfix_mydestination }}
 relayhost = {{ postfix_relayhost }}
+{% if postfix_global_extra_conf is defined and postfix_global_extra_conf | length > 0 %}
+{{ postfix_global_extra_conf }}
+{% endif %}
 
 ### Maps
+{% if postfix_local_recipient_maps is defined and postfix_local_recipient_maps | length > 0 %}
 local_recipient_maps = {{ postfix_local_recipient_maps }}
-# Aliases are virtualised as we have to rewrite mostly every internal addresses (cf. virtual_alias_maps)
+{% endif %}
 alias_maps = {{ postfix_alias_maps }}
 alias_database = {{ postfix_alias_database }}
 {% if postfix_map_extra_conf is defined and postfix_map_extra_conf | length > 0 %}
@@ -34,46 +40,27 @@ inet_protocols = {{ postfix_inet_protocols }}
 {{ postfix_network_extra_conf }}
 {% endif %}
 
-### queues and limits
-mailbox_size_limit = 0
-recipient_delimiter = +
-queue_directory = /var/spool/postfix
-message_size_limit = 52428800
+### Queues and Limits
+{% if postfix_queue_extra_conf is defined and postfix_queue_extra_conf | length > 0 %}
+{{ postfix_queue_extra_conf }}
+{% endif %}
 
-### TLS parameters
-# client side
-smtp_tls_CApath = /etc/ssl/certs
-smtp_tls_security_level = may
-smtp_tls_mandatory_ciphers = high
-smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
-# server side
-smtpd_use_tls= {{ postfix_smtpd_use_tls }}
-smtpd_tls_received_header = {{ postfix_smtpd_tls_received_header }}
-smtpd_tls_security_level={{ postfix_smtpd_tls_security_level }}
-smtpd_tls_cert_file = {{ postfix_smtpd_tls_cert_file }}
-smtpd_tls_key_file = {{ postfix_smtpd_tls_key_file }}
-smtpd_relay_restrictions = {{ postfix_smtpd_relay_restrictions }}
-
-{% if postfix_sasl_auth_enable is defined and postfix_sasl_auth_enable is sameas true %}
-# force client auth
-smtpd_sasl_auth_enable = yes
-smtpd_tls_auth_only = yes
-smtpd_sasl_security_options = noanonymous
-smtpd_sasl_tls_security_options = $smtpd_sasl_security_options
-# configure sasl
-smtpd_sasl_type = cyrus
-smtpd_sasl_path = smtpd
-broken_sasl_auth_clients = yes
-
-## relay configuration:
-# relay only sasl_auth emails received by smtpd
-# force tls to connect to relay
-# use sasl_passwd map to connect to relay
-smtp_sasl_auth_enable = yes
-smtp_sasl_security_options = noanonymous
-smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+### TLS CONFIG
+{% if postfix_tls_extra_conf is defined and postfix_tls_extra_conf | length > 0 %}
+{{ postfix_tls_extra_conf }}
 {% endif %}
 
 {% if postfix_extra_options is defined and postfix_extra_options | length > 0 %}
+### Various
 {{ postfix_extra_options }}
+{% endif %}
+
+{% if postfix_sasl_install is sameas true and postfix_sasl_extra_conf is defined and postfix_sasl_extra_conf | length > 0 %}
+### SASL CONFIG
+{{ postfix_sasl_extra_conf }}
+{% endif %}
+
+{% if postfix_dkim_install is sameas true and postfix_dkim_options is defined and postfix_dkim_options | length > 0 %}
+### DKIM Config
+{{ postfix_dkim_options }}
 {% endif %}

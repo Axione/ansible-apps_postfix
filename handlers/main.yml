@@ -9,10 +9,6 @@
     name: postfix
     state: reloaded
 
-- name: Postmap sasl_passwd
-  ansible.builtin.command: postmap /etc/postfix/sasl_passwd
-  changed_when: false
-
 - name: Restart saslauthd
   ansible.builtin.service:
     name: saslauthd
