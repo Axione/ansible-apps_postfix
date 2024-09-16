@@ -1,6 +1,6 @@
 ---
 - name: "Install dkim packages"
-  ansible.builtin.package:                                                                                                                                                                                          
+  ansible.builtin.package:
     name: ['opendkim', 'opendkim-tools']
     state: present
   register: pkg_result
@@ -27,7 +27,7 @@
     mode: '0644'
   notify: Restart opendkim
 
-- name: Create opendkim folders
+- name: "Create opendkim folders"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -63,15 +63,16 @@
     mode: '0644'
   notify: Restart opendkim
 
-- name: Create opendkim keys folders
+- name: "Create opendkim keys folders"
   ansible.builtin.file:
     path: "/etc/opendkim/keys/{{ item }}"
     state: directory
     mode: '0755'
   with_items: "{{ smtp_opendkim_domains }}"
 
-- name: opendkim | generate keys
+- name: "Generate keys"
   ansible.builtin.command: "opendkim-genkey -s smtp -d {{ item }}"
+  changed_when: false
   args:
     chdir: "/etc/opendkim/keys/{{ item }}"
   with_items: "{{ smtp_opendkim_domains }}"
@@ -84,7 +85,7 @@
     group: opendkim
   with_items: "{{ smtp_opendkim_domains }}"
 
-- name: Chown keys public
+- name: "Chown keys public"
   ansible.builtin.file:
     path: "/etc/opendkim/keys/{{ item }}/smtp.txt"
     mode: '0600'
@@ -92,7 +93,7 @@
     group: opendkim
   with_items: "{{ smtp_opendkim_domains }}"
 
-- name: Start opendkim
+- name: "Start opendkim"
   ansible.builtin.systemd:
     name: opendkim
     state: started

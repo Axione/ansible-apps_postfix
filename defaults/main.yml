@@ -98,7 +98,7 @@ postfix_dkim_options: |
   smtpd_milters = inet:localhost:8891
   non_smtpd_milters = inet:localhost:8891
 
-smtp_opendkim_domains: 
+smtp_opendkim_domains:
   - exemple.fr
 
 smtp_opendkim_config: |

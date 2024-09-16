@@ -1,5 +1,5 @@
 ---
-- name: configure debconf
+- name: "Configure debconf"
   ansible.builtin.debconf:
     name: "{{ item.name }}"
     question: "{{ item.question }}"
@@ -42,7 +42,7 @@
     dest: "/etc/postfix/{{ item }}"
     owner: root
     group: root
-    mode: 0600
+    mode: '0600'
   with_items:
     "{{ postfix_extra_files }}"
   when:
@@ -51,7 +51,7 @@
   notify:
     - Reload postfix
 
-- name: Postmap files
+- name: "Postmap files"
   ansible.builtin.command: postmap /etc/postfix/{{ item }}
   changed_when: false
   with_items:
@@ -60,18 +60,18 @@
     - postfix_extra_files is defined
     - postfix_extra_files | length > 0
 
-- name: Include sasl tasks
+- name: "Include sasl tasks"
   ansible.builtin.include_tasks: sasl.yml
   when:
     - postfix_sasl_install is defined
     - postfix_sasl_install | bool
 
-- name: Include opendkim tasks
+- name: "Include opendkim tasks"
   ansible.builtin.include_tasks: opendkim.yml
   when:
     - postfix_dkim_install is defined
     - postfix_dkim_install | bool
 
-- name: Rebuild newaliases
+- name: "Rebuild newaliases"
   ansible.builtin.command: newaliases
   changed_when: false
