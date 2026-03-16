@@ -34,7 +34,7 @@ postfix_network_extra_conf: ""
 postfix_queue_extra_conf: |
   mailbox_size_limit = 0
   recipient_delimiter = +
-
+  message_size_limit = 50971520
 ### TLS
 postfix_tls_extra_conf: |
   smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
